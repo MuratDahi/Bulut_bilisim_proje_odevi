@@ -12,7 +12,7 @@ Bu proje, bir yapay zeka uygulamasının Docker ile konteynerize edilmesi, Kuber
 
 Projenin temel web uygulaması Python Flask ile geliştirilmiştir. Uygulamanın çalışma ortamı `Dockerfile` ile izole edilmiştir.
 
-- **İmaj Adı:** `MuratDahi/crynet-ai:version-1`
+- **İmaj Adı:** `muratdahi/crynet-ai:version-1`
 - **Port:** 8000
 - **Model:** `crynet_model.pkl`
 
