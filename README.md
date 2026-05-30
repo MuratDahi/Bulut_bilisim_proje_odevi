@@ -4,9 +4,9 @@ Bu proje, bir yapay zeka uygulamasının Docker ile konteynerize edilmesi, Kuber
 
 ## Proje Görev Dağılımı
 
-- **Murat Dahi (23010310025):** Uygulama Mimarisi, Docker Konteynerizasyonu, Python Flask uygulaması.
+- **Murat Dahi (23010310025):** Uygulama Mimarisi, Docker Konteynerizasyonu, Python Flask uygulaması, Github Actions.
 - **Yunus Emre Taşkesen (23010310067):** Kubernetes Mimarisi, GKE Cluster yönetimi, Manifest dosyaları.
-- **Salih Unat (23010310078):** CI/CD Pipeline, GitHub Actions/Google Cloud Build entegrasyonu, Dokümantasyon.
+- **Salih Unat (23010310078):** CI/CD Pipeline, Google Cloud Build entegrasyonu, Dokümantasyon.
 
 ## (Murat Dahi)
 
