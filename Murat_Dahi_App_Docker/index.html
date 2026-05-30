@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="en" class="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CryNet AI | Neural Diagnostic Interface</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Geist:wght@300;400;600;800&family=JetBrains+Mono:wght@400&display=swap");
+
+      :root {
+        --primary: #14b8a6;
+        --bg-deep: #020617;
+      }
+      body {
+        font-family: "Geist", sans-serif;
+        background: var(--bg-deep);
+        color: white;
+      }
+
+      .glass-panel {
+        background: rgba(15, 23, 42, 0.7);
+        backdrop-filter: blur(40px);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+
+      .scanning-line {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 2px;
+        background: var(--primary);
+        box-shadow: 0 0 20px var(--primary);
+        animation: scan 4s linear infinite;
+        opacity: 0;
+      }
+      @keyframes scan {
+        0% {
+          top: 0;
+        }
+        100% {
+          top: 100%;
+        }
+      }
+    </style>
+  </head>
+  <body class="min-h-screen flex items-center justify-center p-6">
+    <div class="fixed inset-0 z-[-1] opacity-30">
+      <div
+        class="absolute w-[800px] h-[800px] bg-teal-900/30 rounded-full blur-[150px] top-[-20%] left-[-10%]"
+      ></div>
+    </div>
+
+    <main class="max-w-2xl w-full">
+      <header class="flex justify-between items-end mb-12">
+        <div>
+          <h1 class="text-6xl font-black tracking-tighter italic">
+            CryNet <span class="text-teal-400">AI</span>
+          </h1>
+          <p class="text-teal-500 font-mono tracking-[0.2em] text-xs">
+            BABY_CRY_CLASSIFIER_v1.0
+          </p>
+        </div>
+        <div class="text-right">
+          <div class="text-teal-400 font-bold">STATUS: READY</div>
+          <div class="text-[10px] text-slate-500 font-mono">
+            NODE: Bartin_Uni_Local
+          </div>
+        </div>
+      </header>
+
+      <section
+        class="glass-panel p-10 rounded-[3rem] relative overflow-hidden group"
+      >
+        <div class="scanning-line group-hover:opacity-100"></div>
+
+        <div class="grid md:grid-cols-2 gap-10">
+          <div
+            id="drop-zone"
+            class="border-2 border-dashed border-slate-700 p-8 rounded-[2rem] text-center transition-all cursor-pointer hover:border-teal-500 hover:bg-teal-500/10"
+            onclick="document.getElementById('fileInput').click()"
+          >
+            <div
+              id="ui-icon"
+              class="text-6xl mb-4 transition-transform group-hover:scale-110"
+            >
+              ◈
+            </div>
+            <p id="file-label" class="text-slate-400 text-sm">
+              Upload or drag audio signal
+            </p>
+            <input
+              type="file"
+              id="fileInput"
+              class="hidden"
+              accept="audio/*"
+              onchange="updateUI(this)"
+            />
+          </div>
+
+          <div class="flex flex-col justify-between">
+            <div>
+              <h2 class="text-2xl font-bold mb-4">Diagnostic Pipeline</h2>
+              <ul class="space-y-3 text-slate-400 text-sm font-mono">
+                <li class="flex items-center gap-2">
+                  <span>•</span> Feature Extraction (MFCC)
+                </li>
+                <li class="flex items-center gap-2">
+                  <span>•</span> Random Forest Classifier
+                </li>
+                <li class="flex items-center gap-2">
+                  <span>•</span> Decision Tree Analysis
+                </li>
+              </ul>
+            </div>
+            <button
+              onclick="startAnalysis()"
+              class="mt-8 bg-teal-500 hover:bg-teal-400 text-slate-950 py-5 rounded-2xl font-black transition-all shadow-[0_0_20px_rgba(20,184,166,0.3)]"
+            >
+              EXECUTE ANALYSIS
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <div
+        id="result-zone"
+        class="hidden mt-8 p-8 glass-panel rounded-[2rem] text-center border-l-4 border-l-teal-500"
+      >
+        <h3
+          class="text-slate-500 text-xs uppercase tracking-widest mb-2 font-mono"
+        >
+          Inference Result
+        </h3>
+        <div id="output" class="text-5xl font-black tracking-tight">--</div>
+      </div>
+    </main>
+
+    <script>
+      function updateUI(input) {
+        if (input.files.length > 0) {
+          document.getElementById("file-label").innerText =
+            "📂 " + input.files[0].name;
+          document.getElementById("ui-icon").innerText = "🔊";
+        }
+      }
+
+      async function startAnalysis() {
+        const file = document.getElementById("fileInput").files[0];
+        if (!file) {
+          alert("Please upload a signal file.");
+          return;
+        }
+
+        const resZone = document.getElementById("result-zone");
+        const output = document.getElementById("output");
+
+        resZone.classList.remove("hidden");
+        output.innerText = "Analyzing Signal...";
+        output.className =
+          "text-5xl font-black tracking-tight animate-pulse text-slate-400";
+
+        const formData = new FormData();
+        formData.append("file", file);
+
+        try {
+          const response = await fetch("http://127.0.0.1:8000/predict", {
+            method: "POST",
+            body: formData,
+          });
+          const data = await response.json();
+
+          // İNGİLİZCE ÇIKTI: CRY DETECTED / CRY NOT DETECTED
+          const isDetected = data.result === "CRY DETECTED";
+          output.innerText = isDetected ? "CRY DETECTED" : "CRY NOT DETECTED";
+
+          // Renk ayarı
+          output.className = isDetected
+            ? "text-5xl font-black text-rose-500"
+            : "text-5xl font-black text-teal-400";
+        } catch (e) {
+          output.innerText = "SYSTEM FAILURE";
+          output.className = "text-5xl font-black text-red-500";
+        }
+      }
+    </script>
+  </body>
+</html>
