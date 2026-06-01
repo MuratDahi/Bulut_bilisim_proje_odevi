@@ -25,11 +25,11 @@ steps:
         # containerPort alanını 80'den Murat'ın uygulaması olan 8000'e çekiyoruz
         sed -i "s|containerPort: 80|containerPort: 8000|g" ./Yunus_Emre_Taskesen_Kubernetes/deployment.yaml
 
-  # 4. Adım: Kubernetes dosyalarını GKE Cluster'ına uyguluyoruz (Deploy)
+  # 4. Adım: Kubernetes dosyalarının tamamını GKE Cluster'ına uyguluyoruz 
   - name: 'gcr.io/cloud-builders/gke-deploy'
     args:
       - 'run'
-      - '--filename=./Yunus_Emre_Taskesen_Kubernetes/deployment.yaml'
+      - '--filename=./Yunus_Emre_Taskesen_Kubernetes/'
       - '--location=${_GKE_ZONE}'
       - '--cluster=${_CLUSTER_NAME}'
 
