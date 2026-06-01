@@ -33,6 +33,9 @@ steps:
       - '--location=${_GKE_ZONE}'
       - '--cluster=${_CLUSTER_NAME}'
 
+options:
+  logging: CLOUD_LOGGING_ONLY
+
 # Cloud Build Trigger ekranında alt kısma ekleyeceğiniz değişkenlerin tanımları
 substitutions:
   _GAR_LOCATION: 'us-central1'         # Deponun regionu
