@@ -41,5 +41,5 @@ substitutions:
   _GAR_LOCATION: 'us-central1'         # Deponun regionu
   _REGISTRY_NAME: 'crynet-repo'         # Adım 3'teki depo adı
   _IMAGE_NAME: 'crynet-app'
-  #_GKE_ZONE: 'us-central1-a'           # Yunus'un cluster bölgesi
-  #_CLUSTER_NAME: 'cluster-adi-buraya'  # Yunus'un cluster adı
+  _GKE_ZONE: 'us-central1'           # Cluster bölgesi
+  _CLUSTER_NAME: 'crynet-cluster'  # Cluster adı
