@@ -16,7 +16,7 @@ spec:
       - name: web-container
         image: nginx:latest
         ports:
-        - containerPort: 80
+        - containerPort: 8000
         volumeMounts:
         - name: depo-alani
           mountPath: /usr/share/nginx/html
