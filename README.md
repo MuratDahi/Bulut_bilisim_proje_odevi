@@ -17,3 +17,18 @@ Projenin temel web uygulaması Python Flask ile geliştirilmiştir. Uygulamanın
 - **Model:** `crynet_model.pkl`
 
 _Not: Yukarıda ki imaj ismi kullanilabilir._
+
+## (Salih Unat)
+
+Projenin sürekli entegrasyon (CI), sürekli dağıtım (CD), bulut altyapı yönetimi ve sistem entegrasyonu süreçleri yürütülmüştür. Proje kapsamında gerçekleştirilen teknik adımlar şunlardır:
+
+- **CI/CD Pipeline Yapılandırması:** Projenin tam otomatik dağıtım süreçleri için **Google Cloud Build** entegrasyonu gerçekleştirilmiş ve `cloudbuild.yaml` boru hattı mimarisi sıfırdan tasarlanmıştır. GitHub ana branch'ine yapılan her `push` işleminin sistemi otomatik tetiklemesi sağlanmıştır.
+- **IAM ve Güvenlik Yetkilendirmeleri:** Cloud Build servis hesabına GKE üzerinde güvenli dağıtım yapabilmesi için `Kubernetes Engine Developer` rolü atanmıştır. Servis hesabı yetki sınırlarından kaynaklanan loglama blokajı, pipeline mimarisine `options: logging: CLOUD_LOGGING_ONLY` konfigürasyonu entegre edilerek çözülmüştür.
+- **Dinamik Manifesto Yamalama (Automated Patching):** Boru hattı üzerine entegre edilen `sed` betikleri vasıtasıyla, Kubernetes `deployment.yaml` dosyasındaki taslak `nginx:latest` imaj alanı Artifact Registry'deki benzersiz sürüm etiketiyle (`SHORT_SHA`) dinamik olarak değiştirilmiş ve container portu uygulamanın asıl çalışma portu olan `8000` ile otomatik eşitlenmiştir.
+- **Altyapı Dağıtımı ve GKE Yönetimi:** Küme kaynaklarını ve bütçeyi optimize etmek amacıyla `us-central1` bölgesinde **GKE Autopilot** kümesi (`crynet-cluster`) ayağa kaldırılmıştır. Pipeline dağıtım adımında tekil dosya yerine tüm klasör hedeflenerek; `deployment.yaml`, `service.yaml`, `pvc.yaml` ve `networkpolicy.yaml` nesnelerinin cluster üzerine eşzamanlı ve bağımlılık hatası olmadan kurulması sağlanmıştır.
+- **Ağ Güvenliği ve Port Çözümlemesi (Troubleshooting):** Canlı dağıtım sonrasında LoadBalancer dış IP'sinin uygulamaya erişememesi sorunu analiz edilmiş; `networkpolicy.yaml` dosyasında yer alan ingress kısıtlamasının pod içi `port: 80` yerine uygulamanın asıl yayın yaptığı `port: 8000` (FastAPI) kapısına çekilmesi sağlanarak ağ blokajı tamamen çözülmüş ve sistem kesintisiz olarak dış dünyaya açılmıştır.
+
+### Proje Teknik Özeti
+* **Kullanılan CI/CD Aracı:** Google Cloud Build (Jenkins alternatifi sunucusuz bulut çözümü)
+* **Canlı Altyapı:** Google Kubernetes Engine (GKE) Autopilot - 3 Aktif Node
+* **Üretim Ortamı Dış IP Adresi:** http://35.225.10.205 (Port 80 HTTP karşılaması, Port 8000 TargetPort yönlendirmesi)
