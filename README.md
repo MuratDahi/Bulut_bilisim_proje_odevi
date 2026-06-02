@@ -26,14 +26,14 @@ kurgulanmıştır.
 
 **Geliştirilen Manifest Dosyaları:**
 
-- **deployment.yaml:** Yapay zeka uygulamasının **(muratdahi/crynet-ai:version-1)** cluster içerisinde Pod'lar halinde çalışmasını sağlayan orkestrasyon
-dosyasıdır. Uygulamanın 8000 portundan dinlenmesi ve kalıcı diskin (PVC) konteyner içindeki **/app/data** dizinine bağlanması (Volume Mount) bu mimaride
+- **deployment.yaml:** Yapay zeka uygulamasının (`muratdahi/crynet-ai:version-1`) cluster içerisinde Pod'lar halinde çalışmasını sağlayan orkestrasyon
+dosyasıdır. Uygulamanın 8000 portundan dinlenmesi ve kalıcı diskin (PVC) konteyner içindeki `/app/data` dizinine bağlanması (Volume Mount) bu mimaride
 tanımlanmıştır.
 
-- **service.yaml:** GKE üzerinde dış dünyadan erişilebilir statik bir External-IP sağlayan **LoadBalancer** servisidir. Gelen standart web trafiğini (Port 80),
+- **service.yaml:** GKE üzerinde dış dünyadan erişilebilir statik bir External-IP sağlayan `LoadBalancer` servisidir. Gelen standart web trafiğini (Port 80),
 içeride çalışan Flask uygulamasının dinlediği hedefe (TargetPort 8000) yönlendirir.
 
-- **pvc.yaml:** Projenin durum bilgisi (Stateful) gereksinimlerini karşılamak üzere **ReadWriteOnce** erişim modunda yapılandırılmış Kalıcı Depolama Alanı
+- **pvc.yaml:** Projenin durum bilgisi (Stateful) gereksinimlerini karşılamak üzere `ReadWriteOnce` erişim modunda yapılandırılmış Kalıcı Depolama Alanı
 (Persistent Volume Claim) manifestosudur.
 
 - **networkpolicy.yaml:** Küme içerisindeki Pod'ların ağ trafiğini sınırlandıran güvenlik kalkanıdır. Zero Trust mantığıyla, Ingress (giriş) trafiğine sadece
@@ -42,12 +42,12 @@ uygulamanın çalıştığı 8000 portu üzerinden izin verilmiştir.
 
 **Sistem Operasyonları ve Hata Yönetimi:**
 
-- **Ölçekleme (Scaling):** Sistem yüküne göre sunucu kaynaklarının **kubectl scale** komutlarıyla manuel olarak artırılıp azaltılması test edilmiştir.
+- **Ölçekleme (Scaling):** Sistem yüküne göre sunucu kaynaklarının `kubectl scale` komutlarıyla manuel olarak artırılıp azaltılması test edilmiştir.
 
-- Rolling Update ve Rollback: Uygulamanın yeni versiyonlarının sıfır kesinti (Zero Downtime) ile canlıya alınması sağlanmıştır. Olası bir sürüm hatasında **kubectl
-rollout** undo komutuyla saniyeler içinde stabil sürüme geri dönme senaryoları tasarlanmış ve doğrulanmıştır.
+- Rolling Update ve Rollback: Uygulamanın yeni versiyonlarının sıfır kesinti (Zero Downtime) ile canlıya alınması sağlanmıştır. Olası bir sürüm hatasında `kubectl
+rollout` undo komutuyla saniyeler içinde stabil sürüme geri dönme senaryoları tasarlanmış ve doğrulanmıştır.
 
-- **Deadlock Çözümü: ReadWriteOnce** kuralına sahip kalıcı disklerin Rolling Update veya Scaling sırasında yaratabileceği kilitlenme (ContainerCreating durumunda
+- **Deadlock Çözümü:** `ReadWriteOnce` kuralına sahip kalıcı disklerin Rolling Update veya Scaling sırasında yaratabileceği kilitlenme (ContainerCreating durumunda
 takılı kalma) senaryoları analiz edilmiş ve "Scale to Zero" mantığıyla operasyonel çözümler sisteme entegre edilmiştir.
 
 ## (Salih Unat)
