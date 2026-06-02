@@ -1,0 +1,45 @@
+steps:
+  # 1. Adım: Murat'ın Dockerfile'ını kullanarak imajı build ediyoruz
+  - name: 'gcr.io/cloud-builders/docker'
+    args: [
+      'build', 
+      '-t', '${_GAR_LOCATION}-docker.pkg.dev/${PROJECT_ID}/${_REGISTRY_NAME}/${_IMAGE_NAME}:${SHORT_SHA}', 
+      './Murat_Dahi_App_Docker'
+    ]
+
+  # 2. Adım: Oluşan imajı Artifact Registry deposuna yüklüyoruz
+  - name: 'gcr.io/cloud-builders/docker'
+    args: [
+      'push', 
+      '${_GAR_LOCATION}-docker.pkg.dev/${PROJECT_ID}/${_REGISTRY_NAME}/${_IMAGE_NAME}:${SHORT_SHA}'
+    ]
+
+  # 3. Adım: Yunus'un deployment.yaml dosyasındaki taslak alanları sed ile güncelliyoruz
+  - name: 'gcr.io/cloud-builders/gcloud'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        # nginx olan imajı kendi ürettiğimiz imajla değiştiriyoruz
+        sed -i "s|image: nginx:latest|image: ${_GAR_LOCATION}-docker.pkg.dev/${PROJECT_ID}/${_REGISTRY_NAME}/${_IMAGE_NAME}:${SHORT_SHA}|g" ./Yunus_Emre_Taskesen_Kubernetes/deployment.yaml
+        # containerPort alanını 80'den Murat'ın uygulaması olan 8000'e çekiyoruz
+        sed -i "s|containerPort: 80|containerPort: 8000|g" ./Yunus_Emre_Taskesen_Kubernetes/deployment.yaml
+
+  # 4. Adım: Kubernetes dosyalarının tamamını GKE Cluster'ına uyguluyoruz 
+  - name: 'gcr.io/cloud-builders/gke-deploy'
+    args:
+      - 'run'
+      - '--filename=./Yunus_Emre_Taskesen_Kubernetes/'
+      - '--location=${_GKE_ZONE}'
+      - '--cluster=${_CLUSTER_NAME}'
+
+options:
+  logging: CLOUD_LOGGING_ONLY
+
+# Cloud Build Trigger ekranında alt kısma ekleyeceğiniz değişkenlerin tanımları
+substitutions:
+  _GAR_LOCATION: 'us-central1'         # Deponun regionu
+  _REGISTRY_NAME: 'crynet-repo'         # Adım 3'teki depo adı
+  _IMAGE_NAME: 'crynet-app'
+  _GKE_ZONE: 'us-central1'           # Cluster bölgesi
+  _CLUSTER_NAME: 'crynet-cluster'  # Cluster adı
